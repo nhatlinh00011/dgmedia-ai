@@ -1,1 +1,0 @@
-# dgmedia-ai
