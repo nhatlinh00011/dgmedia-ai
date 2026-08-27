@@ -1,0 +1,12 @@
+{
+  "name": "dgmedia-ai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.8.0"
+  }
+}
