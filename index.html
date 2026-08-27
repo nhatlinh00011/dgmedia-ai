@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DG Media AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #07111f;
+      --panel: #0d1b2d;
+      --panel2: #12243a;
+      --border: rgba(255,255,255,.1);
+      --text: #f5f7fb;
+      --muted: #91a0b5;
+      --green: #25d366;
+      --green2: #18a957;
+      --danger: #ff5c5c;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(37,211,102,.12), transparent 30%),
+        radial-gradient(circle at top left, rgba(44,130,255,.12), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #25d366, #0e8f4d);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: white;
+      box-shadow: 0 8px 30px rgba(37,211,102,.25);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge {
+      background: rgba(37,211,102,.12);
+      border: 1px solid rgba(37,211,102,.25);
+      color: #69e79a;
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: rgba(13,27,45,.88);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      backdrop-filter: blur(15px);
+    }
+
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 17px;
+    }
+
+    .upload {
+      border: 1.5px dashed #49627e;
+      border-radius: 18px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      overflow: hidden;
+      background: rgba(255,255,255,.02);
+      transition: .2s;
+    }
+
+    .upload:hover {
+      border-color: var(--green);
+      background: rgba(37,211,102,.04);
+    }
+
+    .upload-content {
+      padding: 25px;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .upload strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .upload span {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    #preview {
+      width: 100%;
+      height: 100%;
+      max-height: 420px;
+      object-fit: contain;
+      display: none;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      background: #091625;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      color: white;
+      padding: 13px;
+      outline: none;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 125px;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: var(--green);
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .generate {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      box-shadow: 0 10px 30px rgba(37,211,102,.2);
+      transition: .2s;
+    }
+
+    .generate:hover {
+      transform: translateY(-1px);
+    }
+
+    .generate:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 13px;
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #050d17;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px;
+      display: none;
+    }
+
+    .result video {
+      width: 100%;
+      max-height: 550px;
+      border-radius: 13px;
+      background: black;
+    }
+
+    .download {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      background: #172a42;
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .download:hover {
+      background: #203b5c;
+    }
+
+    .history {
+      margin-top: 20px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.03);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .tips {
+      margin-top: 15px;
+      padding: 13px;
+      background: rgba(37,211,102,.05);
+      border: 1px solid rgba(37,211,102,.12);
+      border-radius: 13px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media(max-width: 800px) {
+      .app {
+        padding: 12px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 15px;
+        border-radius: 18px;
+      }
+
+      .upload {
+        min-height: 250px;
+      }
+
+      header {
+        margin-bottom: 15px;
+      }
+
+      .badge {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="logo">DG</div>
+
+      <div>
+        <h1>DG Media AI</h1>
+        <p>Image → Video AI Studio</p>
+      </div>
+    </div>
+
+    <div class="badge">
+      ● AI VIDEO
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- LEFT -->
+    <section class="panel">
+
+      <h2>1. Hình ảnh</h2>
+
+      <label for="imageInput" class="upload" id="uploadBox">
+
+        <div class="upload-content" id="uploadContent">
+          <div class="upload-icon">🖼️</div>
+
+          <strong>Chọn hình ảnh</strong>
+
+          <span>
+            JPG, PNG, WEBP
+          </span>
+
+          <span>
+            Nhấn để tải ảnh lên
+          </span>
+        </div>
+
+        <img id="preview">
+
+      </label>
+
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/png,image/jpeg,image/webp"
+      >
+
+      <div class="tips">
+        💡 Ảnh càng rõ và chủ thể càng nổi bật,
+        kết quả chuyển động thường càng ổn định.
+      </div>
+
+    </section>
+
+
+    <!-- RIGHT -->
+    <section class="panel">
+
+      <h2>2. Tạo video</h2>
+
+      <div class="field">
+
+        <label for="prompt">
+          Mô tả chuyển động
+        </label>
+
+        <textarea
+          id="prompt"
+          placeholder="Ví dụ: Cô gái nhẹ nhàng quay đầu nhìn ra cửa sổ, tóc bay theo gió, camera slowly pushes in, cinematic lighting..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="field">
+
+          <label>Thời lượng</label>
+
+          <select id="duration">
+
+            <option value="5">5 giây</option>
+            <option value="10" selected>10 giây</option>
+            <option value="15">15 giây</option>
+            <option value="20">20 giây</option>
+            <option value="30">30 giây</option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Độ phân giải</label>
+
+          <select id="resolution">
+
+            <option value="480p">
+              480p - nhanh
+            </option>
+
+            <option value="720p" selected>
+              720p - chất lượng
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Âm thanh AI</label>
+
+        <select id="audio">
+
+          <option value="true" selected>
+            Bật âm thanh
+          </option>
+
+          <option value="false">
+            Không âm thanh
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <button
+        class="generate"
+        id="generateBtn"
+        disabled
+      >
+        ✨ TẠO VIDEO AI
+      </button>
+
+
+      <div
+        class="status"
+        id="status"
+      ></div>
+
+
+      <div
+        class="result"
+        id="result"
+      >
+
+        <video
+          id="video"
+          controls
+          playsinline
+        ></video>
+
+        <a
+          id="download"
+          class="download"
+          target="_blank"
+          rel="noopener"
+        >
+          ⬇️ Mở / tải video
+        </a>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <section class="panel history">
+
+    <h2>Lịch sử tạo</h2>
+
+    <div id="historyList">
+
+      <div class="history-item">
+
+        <div class="dot"></div>
+
+        <span>
+          Chưa có video nào được tạo.
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<script>
+
+const imageInput =
+  document.getElementById("imageInput");
+
+const preview =
+  document.getElementById("preview");
+
+const uploadContent =
+  document.getElementById("uploadContent");
+
+const generateBtn =
+  document.getElementById("generateBtn");
+
+const prompt =
+  document.getElementById("prompt");
+
+const duration =
+  document.getElementById("duration");
+
+const resolution =
+  document.getElementById("resolution");
+
+const audio =
+  document.getElementById("audio");
+
+const status =
+  document.getElementById("status");
+
+const result =
+  document.getElementById("result");
+
+const video =
+  document.getElementById("video");
+
+const download =
+  document.getElementById("download");
+
+const historyList =
+  document.getElementById("historyList");
+
+let imageData = null;
+
+
+// =============================
+// IMAGE UPLOAD
+// =============================
+
+imageInput.addEventListener("change", async () => {
+
+  const file = imageInput.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+
+    alert("Vui lòng chọn file hình ảnh.");
+
+    return;
+  }
+
+  try {
+
+    imageData =
+      await compressImage(file);
+
+    preview.src = imageData;
+
+    preview.style.display = "block";
+
+    uploadContent.style.display = "none";
+
+    generateBtn.disabled = false;
+
+    status.textContent =
+      "Ảnh đã sẵn sàng.";
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "Không thể đọc hình ảnh.";
+
+  }
+
+});
+
+
+// =============================
+// COMPRESS IMAGE
+// =============================
+
+function compressImage(file) {
+
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = event => {
+
+      const img = new Image();
+
+      img.onload = () => {
+
+        const maxSize = 1600;
+
+        let width = img.width;
+
+        let height = img.height;
+
+        if (width > maxSize || height > maxSize) {
+
+          const scale =
+            Math.min(
+              maxSize / width,
+              maxSize / height
+            );
+
+          width *= scale;
+
+          height *= scale;
+        }
+
+        const canvas =
+          document.createElement("canvas");
+
+        canvas.width = width;
+
+        canvas.height = height;
+
+        const ctx =
+          canvas.getContext("2d");
+
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          width,
+          height
+        );
+
+        resolve(
+          canvas.toDataURL(
+            "image/jpeg",
+            0.82
+          )
+        );
+
+      };
+
+      img.onerror = reject;
+
+      img.src = event.target.result;
+
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
+
+
+// =============================
+// GENERATE
+// =============================
+
+generateBtn.addEventListener(
+  "click",
+  generateVideo
+);
+
+
+async function generateVideo() {
+
+  if (!imageData) {
+
+    alert("Hãy chọn hình ảnh trước.");
+
+    return;
+  }
+
+  if (!prompt.value.trim()) {
+
+    alert("Hãy nhập prompt chuyển động.");
+
+    prompt.focus();
+
+    return;
+  }
+
+
+  generateBtn.disabled = true;
+
+  result.style.display = "none";
+
+  status.textContent =
+    "⏳ Đang gửi yêu cầu tới AI...";
+
+
+  try {
+
+    const response =
+      await fetch("/api/generate", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          image: imageData,
+
+          prompt: prompt.value.trim(),
+
+          duration: duration.value,
+
+          resolution: resolution.value,
+
+          generate_audio:
+            audio.value === "true"
+
+        })
+
+      });
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Không thể tạo video."
+      );
+
+    }
+
+
+    if (!data.videoUrl) {
+
+      throw new Error(
+        "API không trả về video."
+      );
+
+    }
+
+
+    video.src =
+      data.videoUrl;
+
+    download.href =
+      data.videoUrl;
+
+    download.download =
+      "dgmedia-ai-video.mp4";
+
+
+    result.style.display =
+      "block";
+
+
+    status.textContent =
+      "✅ Video đã được tạo thành công!";
+
+
+    addHistory(
+      prompt.value.trim()
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "❌ " + error.message;
+
+  }
+
+
+  generateBtn.disabled = false;
+
+}
+
+
+// =============================
+// HISTORY
+// =============================
+
+function addHistory(text) {
+
+  const item =
+    document.createElement("div");
+
+  item.className =
+    "history-item";
+
+
+  const dot =
+    document.createElement("div");
+
+  dot.className = "dot";
+
+
+  const span =
+    document.createElement("span");
+
+  span.textContent =
+    new Date().toLocaleTimeString() +
+    " — " +
+    text;
+
+
+  item.appendChild(dot);
+
+  item.appendChild(span);
+
+
+  if (
+    historyList.children.length === 1 &&
+    historyList.textContent.includes(
+      "Chưa có video"
+    )
+  ) {
+
+    historyList.innerHTML = "";
+
+  }
+
+
+  historyList.prepend(item);
+
+}
+
+</script>
+
+</body>
+</html>
